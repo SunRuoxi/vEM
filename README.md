@@ -1,4 +1,5 @@
 Scalable variational inference for super resolution microscopy, AISTAT 2017 
+
 Ruoxi Sun, Evan Archer, Liam Paninski 
 http://biorxiv.org/content/early/2016/11/19/081703
 
