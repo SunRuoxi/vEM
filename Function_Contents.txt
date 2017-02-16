@@ -1,0 +1,40 @@
+Functions: 
+
+(1)FALCON function
+background_estimation: estimate background of raw images.  
+Gauss_kernel: gaussian kernel.  
+handover:  find indices of particles which are close to adjacent grid points.  
+Peakdets_range: estimate estimator position from a blur (intensity-weighted). 
+vEM_Gen_kernels: prepare for FALCON's optimization (FALCON uses composite PSF, i.e. two weighted sum gaussians as PSF. We only use one gaussian for simplicity)
+
+
+(2) vEM
+vEM_simulation: simulated images data and write into obs.tif file 
+vEM_updates: perform variational EM anaysis
+vEM_WriteImage: write data into tif file. 
+plot_CheckLikelihoodPeak: plot laplace approximation against poisson likelihood. 
+q2image: reconstructed a 2d image from one q distribution. 
+VB_qDistribution: reconstructed a 2d image from one q distribution or all q distributions from the same frame. 
+vEM_FALCON: FALCON algorithm. Changed a few default parameters to increase sparsity to achieve the best performance. 
+vEM_constrained_FALCON: constrained FALCON
+vEM_pretrain_hessian: use Automatic differentiation (AD) (package: adigator) to pre-calculate hessians, and save them to avoid re-calculation 
+vEM_HessianInStock_qdist: plug values into the pretrained hessians, refine (optimize over fluorophore position Fi), and generate q distributions. 
+adigatorGenHesFile_ChangeOuputOrder: accessary function to use adigator package (i.e. change the output order of adigator for optimization function fmincon, which requires inputs in the order of function, gradient and hessian)
+vEM_FALCON_EmittersToImage: FALCON's output is a list of emitters position. This function reconstructs an image from the list of emitters. 
+vEM_GetLambda0_weighted: vEM's output are q distributions. This function reconstructs an image from the q dsitributions. When reconstruction, we could choose to weight q distribution by fluorophores intensity or not. 
+
+
+(3) Evaluation 
+for accuracy of individual fluorophores:  the two functions below are essentially the same. As the output of FALCON and vEM are different. FALCON are a list of emitters positions. vEM are a bunch of q distributions. 
+The second function uses intensity-weighted sum of q distributions to transfer them into the form of FALCON. 
+
+vEM_evaluation_FALCON: evaluation for FALCON  
+vEM_evaluation_q_dist: evaluation of refine or vEM
+
+
+for accuracy of overall reconstructed image: 
+vEM_evaluation_overall: evaluation of final resolved image 
+
+vEM_PlotEvaluation_individual: plot evaluation results for individual 
+vEM_PlotEvaluation_overall: plot evaluation results for overall
+ 
