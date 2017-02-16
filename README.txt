@@ -11,7 +11,7 @@ Author: Ruoxi Sun. rs3315@columbia.edu
 Folders: 
 (1) function: functions required by the model. Add the folder to the matlab path. 
 (2) adigator: matlab automatic differentiation package
- https://sourceforge.net/projects/adigator/?source=typ_redirect
+https://sourceforge.net/projects/adigator/?source=typ_redirect
 
 
 The main function is NON_Markov.  
