@@ -12,7 +12,7 @@ Folders:
 (1) function: functions required by the model. 
 (2) adigator: matlab automatic differentiation package
 https://sourceforge.net/projects/adigator/?source=typ_redirect
-Add the above two folders to matlab path. 
+Re-direct to vEM folder. Add the above two folders to matlab path. 
 
 
 The main function is NON_Markov.  This code is for windows machine only. 
