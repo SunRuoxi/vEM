@@ -15,4 +15,4 @@ https://sourceforge.net/projects/adigator/?source=typ_redirect
 Re-direct to vEM folder. Add the above two folders to matlab path. 
 
 
-The main function is NON_Markov.  This code is for windows machine only. 
+The main function is NON_Markov.  This code is for windows machine only (adigator package generates error on mac). 
