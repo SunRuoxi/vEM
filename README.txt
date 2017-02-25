@@ -4,7 +4,7 @@ http://biorxiv.org/content/early/2016/11/19/081703
 
 
 This code was demonstrated in MATLAB 2016a version with CPU
-This code is the main function of the non-Markov model, including the six steps of the non-Markov model.
+We show the non-Markov model, including the six steps of the non-Markov model.
 Author: Ruoxi Sun. rs3315@columbia.edu
 
 
