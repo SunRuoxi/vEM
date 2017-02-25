@@ -12,7 +12,7 @@ Folders:
 (1) function: functions required by the model. 
 (2) adigator: matlab automatic differentiation package
 https://sourceforge.net/projects/adigator/?source=typ_redirect
-(Note that adigator has an issue on matlab 2016b. Fixed here. If you download from adigator from source page, please fix the issue according to https://sourceforge.net/p/adigator/discussion/bugs/thread/84ad9556/?limit=25) 
+(Note that adigator has an issue on matlab 2016b. Fixed here. If you download adigator from the source page, please fix the issue according to https://sourceforge.net/p/adigator/discussion/bugs/thread/84ad9556/?limit=25) 
 
 Re-direct to vEM folder. Add the above two folders to matlab path. 
 
