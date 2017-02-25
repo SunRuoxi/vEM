@@ -266,7 +266,7 @@ constraint_vEM_2_evaluation =  vEM_evaluation_q_dist(qstack_constraint, true_pos
 save([folder_c,'constraint_vEM_2_evaluation'],'constraint_vEM_2_evaluation');
 
 
-%% Save all evaluation
+%% ************************************************************  Save all evaluation  ************************************************************
 evaluation_all = [FALCON_evaluation,Refine_evaluation,vEM_1_evaluation,Constraint_FALCON_evaluation,constraint_Refine_evaluation, constraint_vEM_2_evaluation]; 
 save([folder_c,'evaluation_all'],'evaluation_all');
 
@@ -275,7 +275,7 @@ save([folder_c,'overall_evaluation_all'],'overall_evaluation_all');
 
 reconstructed_image = {out_falcon; im; out_constraint; im_constraint};
 save([folder_c,'reconstructed_image'],'reconstructed_image'); 
-%% Plot steps  
+%% ************************************************************ Plot steps ************************************************************ 
  
 vEM_PlotEvaluation_individual(evaluation_all, folder_c); 
 vEM_PlotEvaluation_overall(overall_evaluation_all, reconstructed_image, folder_c, bdy, high_size, N); 
