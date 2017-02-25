@@ -44,10 +44,10 @@ simparm.psf = psf;
 %simparm.p: emission probability
 simparm.p = p; 
 
-%simparm.dfactor
+%simparm.dfactor (up-scaled factor)
 simparm.dfactor = dfactor; 
 
-%simparm.I 
+%simparm.I (true)
 up_decon = dfactor; 
 bdy = round(img_size * 7/8 *dfactor/3); 
 high_size = img_size * up_decon; 
@@ -62,45 +62,29 @@ simparm.I(:,round(bdy+(high_size-bdy*2)*3/5)) = 1*scale;
 simparm.I(:,round(bdy+(high_size-bdy*2)*4/5)) = 1*scale; 
    
  
-
 inda = zeros(size(simparm.I)); 
 inda(bdy:end-bdy,bdy+1:end-bdy)=1;
-simparm.I = simparm.I.*inda; %imagesc(simparm.I)
+simparm.I = simparm.I.*inda;  
 
-%{
-simparm.I(round(high_size*1/2),round(high_size/150*[60,100])) = up*scale; 
-simparm.I(round(high_size*1/2),round(high_size/150*[40])) = up*scale; 
-simparm.I(round(high_size*1/3),round(high_size/150*[50,110])) = up*scale; 
-simparm.I(round(high_size*1/3),round(high_size/150*[90])) = up*scale; 
-simparm.I(round(high_size/150*[60]),round(high_size*1/2)) = up*scale;
-simparm.I(round(high_size/150*[100]),round(high_size*1/2)) = up*scale;
-%}
-% emission rate
-%p = 0.01; 
-%up= 10; 
-
+% simparm.i (ground truth for individual frames)
 simparm.i = zeros(high_size,high_size,N);
 lambda0 = zeros(high_size); 
 lambda0(simparm.I==scale) = p;
-%lambda0(simparm.I==up*scale)= p*up; 
 simparm.lambda0 = lambda0;  
 
 for idx = 1:N
-   
-   %simparm.i(:,:,idx) = (rand(high_size)<p).* im_low + (rand(high_size)<up*p).* im_high;   %!!WRONG 
-   % simparm.i(:,:,idx) = (rand(high_size)<p).* im_low + sum(rand([high_size,high_size,up])<p,3).* im_high; %OK
-   simparm.i(:,:,idx) = poissrnd(lambda0)*scale; 
-end %imagesc(sum(simparm.i,3))
+ simparm.i(:,:,idx) = poissrnd(lambda0)*scale; 
+end  
 
-%simparm.y
+%simparm.y (observations)
 simparm.y = zeros(img_size,img_size,N); 
 for idx = 1:N
-    %idx
+    
     if mod(idx,100)==1
-        fprintf(['building frame ', num2str(idx),'~', num2str(idx+100), '... \n']);
+        fprintf(['building frame ', num2str(idx),'~', num2str(idx+99), '... \n']);
     end
      
-   [my_x,my_y] = find(simparm.i(:,:,idx)~=0); %high resolution grid
+   [my_x,my_y] = find(simparm.i(:,:,idx)~=0);  
     my_x = my_x - 0.5; 
     my_y = my_y -0.5; 
     true_poses{idx} = [my_y,my_x]; 
@@ -118,7 +102,6 @@ for idx = 1:N
     simparm_i_vec = simparm.i(:,:,idx);
     Falw  = simparm_i_vec(find(simparm.i(:,:,idx)~=0));  
 
-    %Falw =  scale*ones(1,nX);  
     Falx  = [my_x;my_y]/dfactor;  
  
     Xt = X;    
@@ -139,16 +122,15 @@ for idx = 1:N
 
     func = str2func(['@(x) ', strall]);
     qqq = func(Falx);
-    %figure; imagesc(reshape(qqq,img_size,img_size)); title('lambda')
+     
     lambda = reshape(qqq,img_size,img_size) ; 
-    lambda = lambda/sum(lambda(:))*sum(Falw); %normalize lambda
-   % simparm.lambda(:,:,idx) = lambda; 
+    lambda = lambda/sum(lambda(:))*sum(Falw); 
+   
     end
     simparm.y(:,:,idx) =  poissrnd(lambda+background);  
 end
 
-%save([folder, 'simparm'],'simparm','-v7.3');
-% write data into tif  
+ 
 
 vEM_WriteImage(simparm.y, folder);  
 end

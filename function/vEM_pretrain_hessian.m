@@ -1,16 +1,16 @@
 function vEM_pretrain_hessian(num_of_fluo, img_size)
-% pre-train hessians with fixed number of fluorophores per frame and fixed image size 
-% save differetiated files are saved in in folder 'hessians'
+%% ****************************************************************************************************
+%% Pre-train hessians with fixed number of fluorophores per frame and fixed image size 
+%% Save differetiated files are saved in in folder 'hessians'
 %      include: negative log likelihood, gradient, and hessians 
 %      with names: negLikelihood_XXX, negLikelihood_XXX_ADiGatorHes, negLikelihood_XXX_ADiGatorHes
 %                  XXX is number of fluorophores per frame 
-% The hessians can ONLY be used for MATCHED number of fluorophores per frame and image size
-% The hessians can be plugged in different X(fluorophore positions), y(observation), w (intensities), baseline, scale factor
-% 
-
+%% The hessians can ONLY be used for MATCHED number of fluorophores per frame AND image size
+%% The hessians can be plugged in different X(fluorophore positions), y(observation), w (intensities), baseline, and dfactor(up scale factor)
+%% Author: Ruoxi Sun 
+%% ****************************************************************************************************
 
 mkdir('hessians');cd('hessians'); 
-%addpath(genpath('./hessians'))
 addpath(pwd)
 
 for nX = 1:num_of_fluo 
@@ -28,8 +28,7 @@ strall = [];
     end
     strall = ['baseline +', strall]; 
     
-FuncBody = ['-sum(-(', strall, ')+[', 'y','].* log(', strall, ')', ')'];  disp(' NEGATIVE LL!! ')
-%FuncVar = 'x, w, y, c, baseline, one, img_size, Xt, Yt';
+FuncBody = ['-sum(-(', strall, ')+[', 'y','].* log(', strall, ')', ')'];  
 FuncVar = 'x, w, y, c, baseline, one,Xt, Yt';
 FuncName = ['negLikelihood_',num2str(nX)];
 writefunc(FuncName, FuncVar, FuncBody); 
@@ -46,12 +45,9 @@ c_a = adigatorCreateAuxInput([1 1]);
 baseline_a = adigatorCreateAuxInput([1 1]);
 one_a = adigatorCreateAuxInput([1 1]);
 image_size_a = adigatorCreateAuxInput([1 1]);
-%y_a = adigatorCreateAuxInput([image_size_a^2 1]);
- Xt_a = adigatorCreateAuxInput([img_size^2 1]);
- Yt_a = adigatorCreateAuxInput([img_size^2 1]);
-%Xt_a = adigatorCreateAuxInput([image_size_a^2 1]);
-%Yt_a = adigatorCreateAuxInput([image_size_a^2 1]);
-% output = adigatorGenHesFile(FuncName,{x_a, w_a, y_a, c_a, baseline_a,one_a, Xt_a, Yt_a});%good
+Xt_a = adigatorCreateAuxInput([img_size^2 1]);
+Yt_a = adigatorCreateAuxInput([img_size^2 1]);
+ 
 output = adigatorGenHesFile_ChangeOuputOrder(FuncName,{x_a, w_a, y_a, c_a, baseline_a,one_a, Xt_a, Yt_a});
 
 end

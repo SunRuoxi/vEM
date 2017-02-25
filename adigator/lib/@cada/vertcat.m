@@ -3,6 +3,7 @@ function y = vertcat(varargin)
 %
 % Copyright 2011-2014 Matthew J. Weinstein and Anil V. Rao
 % Distributed under the GNU General Public License version 3.0
+if nargin == 1; y = varargin{1}; return; end;
 global ADIGATOR
 NUMvod  = ADIGATOR.NVAROFDIFF;
 fid     = ADIGATOR.PRINT.FID;
@@ -194,9 +195,9 @@ for Icount = 1:nargin
   x = varargin{Icount};
   ADIGATOR.VARINFO.LASTOCC(x.id,1) = ADIGATOR.VARINFO.COUNT;
 end
-y = class(y,'cada');
+y = cada(y);
 ADIGATOR.VARINFO.COUNT = ADIGATOR.VARINFO.COUNT+1;
-if ADIGATOR.FORINFO.FLAG
+if ADIGATOR.FORINFO.FLAG && ADIGATOR.RUNFLAG == 1
   AssignForVertcatData(yNcol,iMrows,y,varargin);
 end
 return
@@ -288,7 +289,7 @@ if isempty(ADIGATORFORDATA(INNERLOC).VERTCAT(VEcount).SIZES)
     % Check for numeric input
     if isnumeric(Inputs{Icount})
       TVcount = TVcount+1;
-      Inputs{Icount} = Num2Overloaded(Inputs{Icount},TVcount);
+      Inputs{Icount} = Num2Overloaded(Inputs{Icount});
     end
     % Check to make sure input and Overmapped inputs match
     Inputs{Icount} = cadaPrintReMap(Inputs{Icount},iOver,Inputs{Icount}.id);
@@ -312,7 +313,7 @@ for Icount = 1:NUMinputs
   % Check for numeric input
   if isnumeric(Inputs{Icount})
     TVcount = TVcount+1;
-    Inputs{Icount} = Num2Overloaded(Inputs{Icount},TVcount);
+    Inputs{Icount} = Num2Overloaded(Inputs{Icount});
   end
   % Check to make sure input and Overmapped inputs match
   Inputs{Icount} = cadaPrintReMap(Inputs{Icount},iOver,Inputs{Icount}.id);
@@ -402,7 +403,7 @@ for Icount = 1:NUMinputs
   ADIGATOR.VARINFO.LASTOCC(x.id,1) = ADIGATOR.VARINFO.COUNT;
 end
 if ~isa(y,'cada')
-  y = class(y,'cada');
+  y = cada(y);
 end
 ADIGATOR.VARINFO.COUNT = ADIGATOR.VARINFO.COUNT+1;
 return
@@ -425,7 +426,7 @@ if nnz(x) < numel(x)
   if size(xrows,2) > 1; xrows = xrows.'; xcols = xcols.'; end
   y.func.zerolocs = [xrows,xcols];
 end
-y = class(y,'cada');
+y = cada(y);
 
 return
 end

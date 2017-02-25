@@ -1,4 +1,7 @@
 function output = adigatorGenHesFile_ChangeOuputOrder(UserFunName,UserFunInputs,varargin)
+% ADiGator function. Here in vEM, we modified its output order
+% Optimization function, such as fmincon, requires inputs in the order of function, gradient and hessian)
+%%
 % ADiGator Hessian File Generation Function: this function is used when you
 % wish to generate a Hessian+gradient of a function with an input variable
 % of differentiation (and any auxillory inputs), and a single output. This

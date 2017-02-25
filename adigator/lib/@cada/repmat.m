@@ -152,7 +152,7 @@ elseif isinf(FMrow) && isinf(repMrow) && xMrow == 1 && ~isinf(FNcol)
 elseif isinf(FNcol) && isinf(xNcol) && repNcol == 1 && ~isinf(FMrow)
   xNcol = 1; rvec = 0;
 elseif isinf(FNcol) && isinf(repNcol) && xNcol == 1 && ~isinf(FMrow)
-  xNcol = 1; rvec = 2;
+  repNcol = 1; rvec = 2;
 elseif ~isinf(FMrow) && ~isinf(FNcol)
   rvec = 0;
 else
@@ -217,11 +217,10 @@ if PFLAG
       ',%1.0f,%1.0f);\n'],repMrow,repNcol);
   end
 end
-
 ADIGATOR.VARINFO.LASTOCC([y.id x.id],1) = ADIGATOR.VARINFO.COUNT;
 ADIGATOR.VARINFO.COUNT                  = ADIGATOR.VARINFO.COUNT+1;
-y = class(y,'cada');
-if ADIGATOR.FORINFO.FLAG
+y = cada(y);
+if ADIGATOR.FORINFO.FLAG && ADIGATOR.RUNFLAG == 1
   AssignForRepmatData(y,x);
 end
 return
@@ -240,19 +239,21 @@ global ADIGATOR ADIGATORFORDATA
 INNERLOC  = ADIGATOR.FORINFO.INNERLOC;
 Rcount    = ADIGATORFORDATA(INNERLOC).COUNT.REPMAT;
 ITERCOUNT = ADIGATORFORDATA(INNERLOC).COUNT.ITERATION;
-x.func.size(isinf(x.func.size)) = 1;
-y.func.size(isinf(y.func.size)) = 1;
+% x.func.size(isinf(x.func.size)) = 1;
+% y.func.size(isinf(y.func.size)) = 1;
 % Assign the Sizes
+tmp = [y.func.size.';x.func.size.'];
+tmp(isinf(tmp)) = 1;
 if ITERCOUNT == 1
   ADIGATORFORDATA(INNERLOC).REPMAT(Rcount).SIZES =...
-    [y.func.size.';x.func.size.'];
+    tmp;
 else
   ADIGATORFORDATA(INNERLOC).REPMAT(Rcount).SIZES(:,ITERCOUNT) = ...
-    [y.func.size.';x.func.size.'];
+    tmp;
 end
 
 % Variable OverMapping
-if ~isa(x,'cada'); x = class(x,'cada'); end
+if ~isa(x,'cada'); x = cada(x); end
 if isempty(ADIGATORFORDATA(INNERLOC).REPMAT(Rcount).VARS)
   % First Call
   ADIGATORFORDATA(INNERLOC).REPMAT(Rcount).VARS{1} = y;
@@ -293,15 +294,15 @@ global ADIGATOR ADIGATORFORDATA
 INNERLOC  = ADIGATOR.FORINFO.INNERLOC;
 Rcount    = ADIGATORFORDATA(INNERLOC).COUNT.REPMAT;
 
-xOver = ADIGATORFORDATA(INNERLOC).REPMAT(Rcount).VARS{2};
-% Check that X is overmapped properly
-x = cadaPrintReMap(x,xOver,x.id);
-
 if isempty(ADIGATORFORDATA(INNERLOC).REPMAT(Rcount).SIZES)
   flag = 0; y = []; return
 else
   flag = 1;
 end
+xOver = ADIGATORFORDATA(INNERLOC).REPMAT(Rcount).VARS{2};
+% Check that X is overmapped properly
+x = cadaPrintReMap(x,xOver,x.id);
+
 CountName = ADIGATORFORDATA(INNERLOC).COUNTNAME;
 fid       = ADIGATOR.PRINT.FID;
 indent    = ADIGATOR.PRINT.INDENT;
@@ -483,7 +484,7 @@ fprintf(fid,[indent,funcstr,'(1:size(',TF1,',1),1:size(',TF1,',2)) = ',TF1,';\n'
 ADIGATOR.VARINFO.LASTOCC([y.id x.id],1) = ADIGATOR.VARINFO.COUNT;
 ADIGATOR.VARINFO.COUNT                  = ADIGATOR.VARINFO.COUNT+1;
 if ~isa(y,'cada')
-  y = class(y,'cada');
+  y = cada(y);
 end
 return
 end

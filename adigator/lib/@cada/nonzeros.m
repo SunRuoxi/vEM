@@ -86,14 +86,14 @@ else
   if PFLAG == 1
     fprintf(fid,[indent,funcstr,' = ',x.func.name,'(:);\n']);
   end
-  if ADIGATOR.FORINFO.FLAG
+  if ADIGATOR.FORINFO.FLAG && ADIGATOR.RUNFLAG == 1
     AssgnForNzInds(1:xMrow*xNcol,2,x.func.size.');
   end
 end
 
 ADIGATOR.FUNCTIONLOCATION([y.id x.id],1) = ADIGATOR.VARINFO.COUNT;
 ADIGATOR.VARINFO.COUNT = ADIGATOR.VARINFO.COUNT+1;
-y = class(y,'cada');
+y = cada(y);
 return
 end
 
@@ -181,6 +181,6 @@ fprintf(fid,[indent,y.func.name,'(1:length(',tempfuncstr,')) = ',tempfuncstr,';\
 
 ADIGATOR.FUNCTIONLOCATION([x.id y.id],1) = ADIGATOR.VARINFO.COUNT;
 ADIGATOR.VARINFO.COUNT = ADIGATOR.VARINFO.COUNT+1;
-y = class(y,'cada');
+y = cada(y);
 return
 end

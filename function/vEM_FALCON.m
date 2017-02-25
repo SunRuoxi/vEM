@@ -1,3 +1,6 @@
+% FALCON code 
+% Made a few minor modifications (i.e. change sparse parameters) to obtain the best performance. 
+function [Results, back_est]= vEM_FALCON(filename, numFrame, Gsigma1, baseline)
 %% ****************************************************************************************************
 %%
 %% Fast localization algorithm based on a continuous-space formulation (FALCON) for high density super-resolution microscopy
@@ -5,28 +8,14 @@
 %%
 %% Input:  filename          : file name of raw camera images, ex) xxx.tif
 %%         numFrame          : number of frames to be reconstructed
-%%         dummyFrame        : number of frames to be discarded first
-%%         ADU               : photons per camera unit (important)
-%%         baseline          : baseline of camera, ex) 100
-%%         pixel_size        : raw camera pixel size in nm
-%%         EM                : ON = 1 OFF = 0
-%%         Gsigma1 & 2       : widths of two Gaussian fuctions 
-%%         Gsimga_ratio      : ratio for two Gaussian functions for PSF: PSF = Gsimga_ratio*F_sigma1 + (1-Gsimga_ratio)*F_sigma2
-%%         Speed             : option for reconstruction speed
-%%         debug             : debug mode
+%%         Gsigma1           : widths of Gaussian fuctions  
+%%         baseline          : baseline of camera, ex) 100  
 %%
 %% Output: Results           : || frame number || x positions || y positions || photon counts || PSF_width_ratio
 %%         back_est          : estimated background 
 %% ****************************************************************************************************
-function [Results, back_est]= vEM_FALCON(filename, numFrame, Gsigma1, baseline)
 %% initialization
-%{
-beep off;
-if matlabpool('size') == 0
-    myCluster = parcluster();
-    matlabpool(myCluster)
-end
-%}
+ 
 EM = 0; 
 ADU = 1; 
 debug = 0;
@@ -36,37 +25,19 @@ dummyFrame = 0;
 
 numFrame = min(numFrame,length(imfinfo(filename)));
 [y_dim,x_dim]= size(single(imread(filename,1)));
-%{
-if nargin <7
-    error('Wrong number of input arguments');
-elseif nargin == 7
-    debug = 0;
-end
-%}
+ 
 %% Common parameters settings
 % parameters are opimized for the condition: PSF_width/pixelsize >> 2
-%boundary = 3;
-%frame_subset_length = 20;
-%wavelet_level = 6;                                                         % for background estimation
-%thresh_delta = 1.1;                                                        % maximum displacement of PSF
-%thresh_level = 0.05;                                                       % Threshold level for initial localization
-
-% sparsity level (if too many false positive, set para = 2.5 or 3) 
-%para = 2;    
-
-
-
-boundary = 0
+ 
+boundary = 0;
 frame_subset_length = 20;
 wavelet_level = 6;                                                         % for background estimation
 thresh_delta = 1.1;                                                        % maximum displacement of PSF
-thresh_level = 0.1%0.05;                                                       % Threshold level for initial localization
+thresh_level = 0.1;                                                  % Threshold level for initial localization
 
 % sparsity level (if too many false positive, set para = 2.5 or 3) 
-para = 3%2%4%3%4  
-%para = 100
-%para = 1
-range=2
+para = 3;
+range=2;
 
 
 
@@ -108,15 +79,7 @@ else
     
 end
 
-%{
-if ~isempty(control_dfactor)
-    up_refine = up_refine; 
-    up_decon = up_decon; 
-end
-
-up_decon
-up_refine
-%}
+ 
 %% reconstruction grid size
 
 est_y_dim_decon = y_dim*up_decon;
@@ -179,7 +142,7 @@ for frame_count = 1: ceil(numFrame/frame_subset_length)
     % load camera images
     for zz = sframe:eframe
         CCD_imgs_sub(:,:,zz-sframe+1) = single(imread(filename,zz));
-       % if ~isscalar(background)
+      
     end
     % averaged image
     avgImg = avgImg +sum(CCD_imgs_sub,3)*ADU/numFrame;

@@ -26,14 +26,15 @@
 %% Parameters
 close all; clear all; 
 
+rng(1)
 % direct to vEM folder
 vEM_folder = pwd; 
 
 mkdir('data'); % speficy the folder we write results in 
-folder = [vEM_folder,'\data\']; 
+folder = [vEM_folder,'/data/']; 
 
-addpath(genpath([vEM_folder,'\function'])); % add the path of "function folder"  
-addpath(genpath([vEM_folder,'\adigator'])); % autodiff package
+addpath(genpath([vEM_folder,'/function'])); % add the path of "function folder"  
+addpath(genpath([vEM_folder,'/adigator'])); % autodiff package
 
 
 % Experimental setup 
@@ -42,7 +43,7 @@ dfactor = 3;
 N = 2000; 
 scale = 1000; 
 baseline = 0.1; 
-p = 0.04;  
+p = 0.025;  
 
 % Image parameters
 img_size = 32;  
@@ -62,8 +63,9 @@ evaluation_radius = high_resolution_pitch * 1.5;
 % stock hessian functions to avoid re-differentiate 
 % write in folder "hessians" 
 % for the same image size, we only need to call this function once. 
-max_num_of_fluo = 50; 
-vEM_pretrain_hessian(max_num_of_fluo, img_size); 
+
+%max_num_of_fluo = 50;
+%vEM_pretrain_hessian(max_num_of_fluo, img_size); 
 %% ************************************************************   Step 0: Simulation  ************************************************************
 
 % generate simulated images and write the images into 'obs.tif'  
@@ -117,7 +119,7 @@ w = extractfield(qstack0,'w'); %intensity or number of photons
 [im0, im_stack0] = vEM_GetLambda0_weighted(qstack0,w,img_size,dfactor);% generate image from q distribution, each q is weighted by its intensities
 
 figure(2)
-imagesc(im0(bdy:high_size-bdy,bdy:high_size-bdy)), title(['initial q0, p=',num2str(simparm.p),', N=',num2str(N)]); colorbar
+imagesc(im0(bdy:high_size-bdy,bdy:high_size-bdy)), title(['initial q0, p=',num2str(simparm.p),', N=',num2str(N)]);  
 saveas(2, [folder, 'q0_initial-1.png'])
 
 % Evaluation 
@@ -150,7 +152,7 @@ save([folder,'lambda0_stack'],'lambda0_stack')
 w = extractfield(qstack,'w'); 
 [im, im_stack] = vEM_GetLambda0_weighted(qstack,w,img_size,dfactor);
 figure(3)
-imagesc(im(bdy:high_size-bdy,bdy:high_size-bdy)), title(['vEM,thre=',num2str(thre),', p=',num2str(simparm.p),', N=',num2str(length(qstack))]); colorbar
+imagesc(im(bdy:high_size-bdy,bdy:high_size-bdy)), title(['vEM,thre=',num2str(thre),', p=',num2str(simparm.p),', N=',num2str(length(qstack))]);  
 saveas(3, [folder,'vEM-1-thre-',num2str(thre),'.png'])
  
 
@@ -167,7 +169,7 @@ save([folder,'vEM_1_evaluation'],'vEM_1_evaluation');
 %% ************************************************************     Step 4: Constrained FALCON      ************************************************************
 
 mkdir(folder,'constraint'); % save results of constrained falcon and after in a new folder 
-folder_c = [folder,'constraint','\']; 
+folder_c = [folder,'constraint','/']; 
  
 % The constraint
 lambda0 = lambda0_stack(:,:,end); % results from step 3
@@ -186,7 +188,7 @@ out_constraint  = vEM_FALCON_EmittersToImage(Results_constraint, img_size, dfact
 save([folder_c,'out_constraint'],'out_constraint');
 
 figure(4)
-imagesc(out_constraint(bdy:high_size-bdy,bdy:high_size-bdy));  colorbar 
+imagesc(out_constraint(bdy:high_size-bdy,bdy:high_size-bdy));   
 title(['constraint FALCON: N=',num2str(N),', p=',num2str(simparm.p) ])
 saveas(4,[folder_c, 'constraint falcon output', '.png'])
 
@@ -214,7 +216,7 @@ w = extractfield(qstack0_constraint,'w');
 [im0_constraint, im_stack0_constraint] = vEM_GetLambda0_weighted(qstack0_constraint,w,img_size,dfactor);
 
 figure(5)
-imagesc(im0_constraint(bdy:high_size-bdy,bdy:high_size-bdy)), title(['after constraint FALCON (refine), initial q0, p=',num2str(simparm.p),', N=',num2str(N)]); colorbar
+imagesc(im0_constraint(bdy:high_size-bdy,bdy:high_size-bdy)), title(['after constraint FALCON (refine), initial q0, p=',num2str(simparm.p),', N=',num2str(N)]);  
 saveas(5, [folder_c, 'q_initial-2.png'])
 
 % Evaluation
@@ -251,7 +253,149 @@ save([folder_c,'lambda0_stack_constraint'],'lambda0_stack_constraint');
 save([folder_c,'im_constraint'],'im_constraint');
 
 figure(6)
-imagesc(im_constraint(bdy:high_size-bdy,bdy:high_size-bdy)), title(['vEM-2,thre=',num2str(thre),', p=',num2str(simparm.p),', N=',num2str(N)]); colorbar
+imagesc(im_constraint(bdy:high_size-bdy,bdy:high_size-bdy)), title(['vEM-2,thre=',num2str(thre),', p=',num2str(simparm.p),', N=',num2str(N)]);  
+saveas(6, [folder_c,'vEM-2-thre-',num2str(thre),'.png']);
+
+% Evaluate
+% Accurracy of reconstructed image (overall) 
+constraint_vEM_2_overall_evaluation = vEM_evaluation_overall(im_constraint, simparm.I, 1) ; 
+constraint_vEM_2_overall_evaluation.t = t;
+save([folder_c, 'constraint_vEM_2_overall_evaluation'],'constraint_vEM_2_overall_evaluation');
+% Accuracy of localization of individual fluorophore (individual)
+constraint_vEM_2_evaluation =  vEM_evaluation_q_dist(qstack_constraint, true_poses, high_resolution_pitch, evaluation_radius, simparm); 
+save([folder_c,'constraint_vEM_2_evaluation'],'constraint_vEM_2_evaluation');
+
+
+%% Save all evaluation
+evaluation_all = [FALCON_evaluation,Refine_evaluation,vEM_1_evaluation,Constraint_FALCON_evaluation,constraint_Refine_evaluation, constraint_vEM_2_evaluation]; 
+save([folder_c,'evaluation_all'],'evaluation_all');
+
+overall_evaluation_all = [FALCON_overall_evaluation,Refine_overall_evaluation,vEM_1_overall_evaluation,Constraint_FALCON_overall_evaluation,constraint_Refine_overall_evaluation,constraint_vEM_2_overall_evaluation]; 
+save([folder_c,'overall_evaluation_all'],'overall_evaluation_all');
+
+reconstructed_image = {out_falcon; im; out_constraint; im_constraint};
+save([folder_c,'reconstructed_image'],'reconstructed_image'); 
+%% Plot steps w = []; 
+[im0_1, im_stack0] = vEM_GetLambda0_weighted(qstack0,w,img_size,dfactor);  
+ 
+thre_level =  2.4583e-05*length(qstack0) + 0.2369; % should adjust based on different context of data 
+thre = max(im0_1(:))* thre_level;   
+
+draw = 1; % draw intermediate result of each iterations. 
+w = extractfield(qstack0,'w'); 
+tic
+[lambda0_stack, qstack] = vEM_updates(qstack0, vEM_nIter, thre, w, img_size, draw, dfactor); 
+t=toc
+
+save([folder,'qstack'],'qstack')
+save([folder,'lambda0_stack'],'lambda0_stack')
+
+% Save and Plot vEM-1
+w = extractfield(qstack,'w'); 
+[im, im_stack] = vEM_GetLambda0_weighted(qstack,w,img_size,dfactor);
+figure(3)
+imagesc(im(bdy:high_size-bdy,bdy:high_size-bdy)), title(['vEM,thre=',num2str(thre),', p=',num2str(simparm.p),', N=',num2str(length(qstack))]);  
+saveas(3, [folder,'vEM-1-thre-',num2str(thre),'.png'])
+ 
+
+% Evaluate
+% Accurracy of reconstructed image (overall) 
+vEM_1_overall_evaluation = vEM_evaluation_overall(im, simparm.I, 1) ; 
+vEM_1_overall_evaluation.t = t;
+save([folder, 'vEM_1_overall_evaluation'],'vEM_1_overall_evaluation');
+% Accuracy of localization of individual fluorophore (individual)
+vEM_1_evaluation =  vEM_evaluation_q_dist(qstack, true_poses, high_resolution_pitch, evaluation_radius, simparm); 
+save([folder,'vEM_1_evaluation'],'vEM_1_evaluation'); 
+
+ 
+%% ************************************************************     Step 4: Constrained FALCON      ************************************************************
+
+mkdir(folder,'constraint'); % save results of constrained falcon and after in a new folder 
+folder_c = [folder,'constraint','/']; 
+ 
+% The constraint
+lambda0 = lambda0_stack(:,:,end); % results from step 3
+
+% Constrainted FALCON
+tic 
+[Results_constraint,back_est_constraint] = vEM_constrained_FALCON([folder,'obs.tif'],N,offset,psf,lambda0); 
+t=toc
+
+%vEM_constrained_FALCON(filename, numFrame, baseline, Gsigma1, lambda0)
+save([folder_c,'Results_constraint'],'Results_constraint');
+save([folder_c,'back_est_constraint'],'back_est_constraint');
+
+% Save and Plot constraint FALCON
+out_constraint  = vEM_FALCON_EmittersToImage(Results_constraint, img_size, dfactor, N);
+save([folder_c,'out_constraint'],'out_constraint');
+
+figure(4)
+imagesc(out_constraint(bdy:high_size-bdy,bdy:high_size-bdy));   
+title(['constraint FALCON: N=',num2str(N),', p=',num2str(simparm.p) ])
+saveas(4,[folder_c, 'constraint falcon output', '.png'])
+
+% Evaluation 
+% Accurracy of reconstructed image (overall) 
+Constraint_FALCON_overall_evaluation = vEM_evaluation_overall(out_constraint, simparm.I, 1) ; 
+Constraint_FALCON_overall_evaluation.t = t;
+save([folder_c, 'Constraint_FALCON_overall_evaluation'],'Constraint_FALCON_overall_evaluation');
+% Accuracy of localization of individual fluorophore (individual)
+Constraint_FALCON_evaluation = vEM_evaluation_FALCON(Results_constraint,true_poses,high_resolution_pitch,N,evaluation_radius, simparm);
+save([folder_c, 'Constraint_FALCON_evaluation'],'Constraint_FALCON_evaluation')
+ 
+%% ************************************************************     Step 5: Prepare vEM-2      ************************************************************
+% Generate hessians and q distribution 
+tic
+   [stat_constraint, qstack0_constraint] = vEM_HessianInStock_qdist(simparm, Results_constraint, img_size, back_est_constraint, refine, test_peaks); 
+t=toc
+
+save([folder_c,'stat_constraint'],'stat_constraint')
+save([folder_c,'qstack0_constraint'],'qstack0_constraint')
+
+
+% Save and Plot q_ini-2
+w = extractfield(qstack0_constraint,'w'); 
+[im0_constraint, im_stack0_constraint] = vEM_GetLambda0_weighted(qstack0_constraint,w,img_size,dfactor);
+
+figure(5)
+imagesc(im0_constraint(bdy:high_size-bdy,bdy:high_size-bdy)), title(['after constraint FALCON (refine), initial q0, p=',num2str(simparm.p),', N=',num2str(N)]);  
+saveas(5, [folder_c, 'q_initial-2.png'])
+
+% Evaluation
+% Accurracy of reconstructed image (overall) 
+constraint_Refine_overall_evaluation = vEM_evaluation_overall(im0_constraint, simparm.I, 1) ; 
+constraint_Refine_overall_evaluation.t = t;
+save([folder_c, 'constraint_Refine_overall_evaluation'],'constraint_Refine_overall_evaluation');
+% Accuracy of localization of individual fluorophore (individual)
+constraint_Refine_evaluation = vEM_evaluation_q_dist(qstack0_constraint, true_poses, high_resolution_pitch, evaluation_radius, simparm); 
+save([folder_c, 'constraint_Refine_evaluation'],'constraint_Refine_evaluation'); 
+
+  
+%% ************************************************************     Step 6: vEM-2      ************************************************************
+
+% Determine soft threhold (empirical)
+w = []; 
+[im0_2, im_stack0] = vEM_GetLambda0_weighted(qstack0_constraint,w,img_size,dfactor);  % reconstructed image by q distribution, not weighted by intensity 
+
+thre_level =  1.7663e-05*length(qstack0_constraint) + 0.2369; % empirical percentage of max value of im0_2
+thre = max(im0_2(:))*thre_level; 
+ 
+
+draw = 1; % draw intermediate result of each iterations. 
+w = extractfield(qstack0_constraint,'w'); 
+tic
+[lambda0_stack_constraint, qstack_constraint] = vEM_updates(qstack0_constraint, vEM_nIter, thre, w, img_size, draw, dfactor); 
+t=toc
+
+save([folder_c,'qstack_constraint'],'qstack_constraint');
+save([folder_c,'lambda0_stack_constraint'],'lambda0_stack_constraint');
+
+% Save and Plot output of vEM
+[im_constraint, im_stack_constraint] = vEM_GetLambda0_weighted(qstack_constraint,w,img_size,dfactor);
+save([folder_c,'im_constraint'],'im_constraint');
+
+figure(6)
+imagesc(im_constraint(bdy:high_size-bdy,bdy:high_size-bdy)), title(['vEM-2,thre=',num2str(thre),', p=',num2str(simparm.p),', N=',num2str(N)]);  
 saveas(6, [folder_c,'vEM-2-thre-',num2str(thre),'.png']);
 
 % Evaluate
@@ -274,5 +418,8 @@ save([folder_c,'overall_evaluation_all'],'overall_evaluation_all');
 reconstructed_image = {out_falcon; im; out_constraint; im_constraint};
 save([folder_c,'reconstructed_image'],'reconstructed_image'); 
 %% Plot steps 
+vEM_PlotEvaluation_individual(evaluation_all, folder_c); 
+vEM_PlotEvaluation_overall(overall_evaluation_all, reconstructed_image, folder_c, bdy, high_size, N); 
+
 vEM_PlotEvaluation_individual(evaluation_all, folder_c); 
 vEM_PlotEvaluation_overall(overall_evaluation_all, reconstructed_image, folder_c, bdy, high_size, N); 

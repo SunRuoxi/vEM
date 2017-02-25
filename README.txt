@@ -13,6 +13,7 @@ Folders:
 (2) adigator: matlab automatic differentiation package
 https://sourceforge.net/projects/adigator/?source=typ_redirect
 Re-direct to vEM folder. Add the above two folders to matlab path. 
+(Note that adigator has an issue on matlab 2016b. Fixed here. If you download from adigator from source page, please fix the issue according to https://sourceforge.net/p/adigator/discussion/bugs/thread/84ad9556/?limit=25) 
 
 
-The main function is NON_Markov.  This code is for windows machine only (adigator package generates error on mac). 
+The main function (demo) is NON_Markov.   

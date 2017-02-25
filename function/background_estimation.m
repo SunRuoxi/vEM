@@ -1,5 +1,5 @@
-%% background estimation using iterative wavelet transform
 function est_bg = background_estimation(imgs,th,dlevel,wavename,iter)
+%% background estimation using iterative wavelet transform
 est_bg = zeros(size(imgs),'single');
 imgs = max(imgs,0);
 for N = 1: size(imgs,3)

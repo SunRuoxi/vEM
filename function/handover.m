@@ -1,5 +1,5 @@
-%% rearrange particles having high displacement values
 function [est_c_new,delta_x_new,delta_y_new,delta_z_new] = handover(est_c,delta_x,delta_y,delta_z)
+%% rearrange particles having high displacement values
 % find indices of particles which are close to adjacent grid points.
 ind_arrange = find((abs(delta_x)>0.99)|(abs(delta_y)>0.99));
 est_c_new = est_c;
@@ -23,7 +23,7 @@ if ~isempty(ind_arrange)
     pos_x_new = min(max(pos_x + delta_x(ind_arrange),0.51),Nx+0.49);
     
     ind_new = sub2ind([Ny,Nx,Nz],round(pos_y_new),round(pos_x_new),pos_z);
-    %[pos_y, delta_y(ind_arrange), pos_y_new, pos_x, delta_x(ind_arrange),pos_x_new]
+    
 
     [ind_new2,ia] = unique(gather(ind_new));
     delta_x_new_temp = pos_x_new - round(pos_x_new);

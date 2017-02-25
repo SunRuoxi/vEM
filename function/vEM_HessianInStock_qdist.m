@@ -35,7 +35,9 @@ id = Results(:,1); % frame index
 stat = []; 
 for idx = 1: N
  
- 	idx
+ 	if mod(idx,100)==1
+        disp(['Refine and calculate hessians: frame ', num2str(idx), '~', num2str(idx+99), '(out of ', num2str(N),' frames)...'])
+    end
     nX = sum(id == idx); 
     stat{idx}.nX = nX;
     stat{idx}.psf = c;  

@@ -1,9 +1,14 @@
-%% Point spread function and its derivatives generation. 
+% FALCON auxiliary function 
 function [fPSF_decon,fPSF_refine,fPSF_dev_x,fPSF_dev_y,fPSF_dev_z] = ...
     vEM_Gen_kernels(x_dim,y_dim,up_decon,up_refine,Gsigma1,delta_sigma)
+% Point spread function and its derivatives generation. 
 
-Gsigma_ratio = 1; % only consider simple gaussian case Gsigma1, instead of composite gaussian
-Gsigma2 = 1.5; %ARBITARY
+Gsigma_ratio = 1; 
+% FALCON uses composite PSF-- weighted PSF of two Gaussians. 
+% Gsigma_ratio: contribution of Gaussian 1. "1-Gsigma_ratio" is contribution of Gaussian 2.
+% In vEM, we only consider simple Gaussian, instead of composite gaussian
+Gsigma2 = 1.5; % ARBITARY  
+
 
 %% PSF for deconvolution steps 1&2
 Gsigma1_decon = Gsigma1*up_decon;

@@ -1,67 +1,43 @@
 function [Results, back_est] =  vEM_constrained_FALCON(filename, numFrame, baseline, Gsigma1, lambda0)
-% the constraint is lambda0 
-
-%constrained FALCON 
-%% initialization
-%{
-beep off;
-if matlabpool('size') == 0
-    myCluster = parcluster();
-    matlabpool(myCluster)
-end
-%}
+%% ****************************************************************************************************
+%% Constrained FALCON: Perform FALCON analysis with the regulation in favor of estimates on the constraint. 
+%%                     Specifically, constrained FALCON puts a inverse lambda0 weights on the L1 norm regulation of FALCON 
+%%                     i.e. arg_X || y - PSF*X ||^2 + 1./lambda0 * |X|
+%%                     
+%% Input:  filename          : file name of raw camera images, ex) xxx.tif
+%%         numFrame          : number of frames to be reconstructed
+%%         Gsigma1           : widths of Gaussian fuctions  
+%%         baseline          : baseline of camera, ex) 100  
+%%         lambda0           : the constraint (on high dimension grid)
+%% Output: Results           : || frame number || x positions || y positions || photon counts || PSF_width_ratio
+%%         back_est          : estimated background 
+%% Author: Ruoxi Sun 
+%% ****************************************************************************************************
+ 
+%% Setup
 EM = 0; 
 ADU = 1; 
 debug = 0;
 speed = 'normal';
 dummyFrame = 0; 
- 
-
- 
 
 numFrame = min(numFrame,length(imfinfo(filename)));
 [y_dim,x_dim]= size(single(imread(filename,1)));
-%{
-if nargin <7
-    error('Wrong number of input arguments');
-elseif nargin == 7
-    debug = 0;
-end
-%}
+ 
 %% Common parameters settings
-% parameters are opimized for the condition: PSF_width/pixelsize >> 2
-%boundary = 3;
-%frame_subset_length = 20;
-%wavelet_level = 6;                                                         % for background estimation
-%thresh_delta = 1.1;                                                        % maximum displacement of PSF
-%thresh_level = 0.05;                                                       % Threshold level for initial localization
-
-% sparsity level (if too many false positive, set para = 2.5 or 3) 
-%para = 2;    
-
-
-
+ 
 boundary = 0
 frame_subset_length = 20;
 wavelet_level = 6;                                                         % for background estimation
 thresh_delta = 1.1;                                                        % maximum displacement of PSF
-thresh_level = 0.1%0.05;                                                       % Threshold level for initial localization
+thresh_level = 0.1                                                         % Threshold level for initial localization
 
-% sparsity level (if too many false positive, set para = 2.5 or 3) 
-para = 3%2%4%3%4  
-%para = 100
-%para = 1
-range=2
-
-
+% Sparsity level (if too many false positive, set para = 2.5 or 3) 
+para = 3 
+range = 2
 inverse_lambda0 = 1; 
 
-
-
-
-
-
-
+ 
 if EM > 0
     ADU = ADU/1.4;
 end
@@ -99,14 +75,7 @@ else
     bg_s = 300;
     
 end
-%{
-if ~isempty(control_dfactor)
-    up_decon = control_dfactor;  
-    up_refine = control_dfactor; 
-end
- up_decon 
- up_refine
-%}
+ 
 %% reconstruction grid size
 
 est_y_dim_decon = y_dim*up_decon;
@@ -124,11 +93,7 @@ est_x_dim_refine_up = (x_dim)*up_refine;
 sigma_delta = 0.15;
 [fPSF_decon,fPSF_refine,fPSF_dev_x,fPSF_dev_y,fPSF_dev_z] = ...
     vEM_Gen_kernels(x_dim,y_dim,up_decon,up_refine,Gsigma1,sigma_delta);
-%{
-sigma_delta = 0.15;
-[fPSF_decon,fPSF_refine,fPSF_dev_x,fPSF_dev_y,fPSF_dev_z] = ...
-    Gen_kernels(x_dim,y_dim,up_decon,up_refine,Gsigma1,Gsigma2,Gsigma_ratio,sigma_delta);
-%}
+ 
 % Fourier coefficients
 InvPSF_base = (repmat(abs(fPSF_decon).^2,[1,1,frame_subset_length]))/(up_decon)^2;
 fPSF_decon_base = (repmat(fPSF_decon,[1,1,frame_subset_length]));

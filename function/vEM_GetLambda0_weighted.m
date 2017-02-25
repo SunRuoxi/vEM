@@ -1,9 +1,19 @@
 function [im, im_stack] = vEM_GetLambda0_weighted(qstack,w,img_size,dfactor)
-
-% generate image from q distribution, each q is weighted by its intensities
  
-% plot reconstructed image (im) from q distribution
-% if w is [] (empty), unweighted,  sum of q distributions 
+%% ****************************************************************************************************
+%% Reconstruct lambda from the q distibutions. Each q can be weighted by its intensity. 
+%% Input:
+%%          qstack:         q distributions stored 
+%%          w:              intensities
+%                           % if w is [] (empty), unweighted by intensities, therefore sum of q distributions 
+%%          img_size:       observed image size 
+%%          dfactor:        resolution up-scaled factor
+%% Output: 
+%%          im:             reconstructed lambda
+%%          im_stack:       reconstructed image frames
+%% Author:  Ruoxi Sun
+%% ****************************************************************************************************
+
 im = zeros(img_size*dfactor);
  
 w_idx = 1; 
@@ -14,7 +24,7 @@ for f = 1:length(qstack)
   prob = squeeze(qstack(f).ppp);
   nX  = qstack(f).nX;
   
-  Xit = qstack(f).Xit;  %not change
+  Xit = qstack(f).Xit;   
   center = qstack(f).center;  
   if f==1
    

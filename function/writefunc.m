@@ -1,5 +1,8 @@
 function writefunc(FuncName, FuncVar, FuncBody)
-%Usage  writefunc('myadd', 'x,y', 'x+y') 
+% Write a function .m file 
+% Usage  writefunc('myadd', 'x,y', 'x+y') 
+% Author: Ruoxi Sun 
+
 HesFileName = FuncName;
 InputStr1 = FuncVar;
 Hfid = fopen([HesFileName,'.m'],'w+');

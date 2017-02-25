@@ -22,7 +22,7 @@ lambda0_stack(:,:,1)= lambda0; % save initial lambda
  
 for iter =  1:nIter
     if draw
-       iter
+       disp(['vEM: iteration=',num2str(iter), ' ...'])
     end
  
     for f = 1:length(qstack) % frame 
@@ -120,14 +120,17 @@ for iter =  1:nIter
    
     end  % end iterate through frames 
  
+ 
 % save lambda
 lambda0_stack(:,:,iter+1) =  max(lambda0-thre,0);
 
 if draw % draw intermediate lambda0 per iteration 
    figure; 
    [im, im_stack] = vEM_GetLambda0_weighted(qstack,w,img_size,dfactor);
-   imagesc(im); colorbar; drawnow;
+   imagesc(im); title(['vEM: iteration=',num2str(iter)]);  axis off; drawnow;
 end
+ 
+ 
  
 end % vEM update end
 
