@@ -64,8 +64,8 @@ evaluation_radius = high_resolution_pitch * 1.5;
 % write in folder "hessians" 
 % for the same image size, we only need to call this function once. 
 
-%max_num_of_fluo = 50;
-%vEM_pretrain_hessian(max_num_of_fluo, img_size); 
+max_num_of_fluo = 50;
+vEM_pretrain_hessian(max_num_of_fluo, img_size); 
 %% ************************************************************   Step 0: Simulation  ************************************************************
 
 % generate simulated images and write the images into 'obs.tif'  
