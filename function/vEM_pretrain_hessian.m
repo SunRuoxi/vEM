@@ -2,7 +2,7 @@ function vEM_pretrain_hessian(num_of_fluo, img_size)
 %% ****************************************************************************************************
 %% Pre-train hessians with fixed number of fluorophores per frame and fixed image size 
 %% Save differetiated files are saved in in folder 'hessians'
-%      include: negative log likelihood, gradient, and hessians 
+%      include: negative log likelihood, negative gradient, and negative hessians 
 %      with names: negLikelihood_XXX, negLikelihood_XXX_ADiGatorHes, negLikelihood_XXX_ADiGatorHes
 %                  XXX is number of fluorophores per frame 
 %% The hessians can ONLY be used for MATCHED number of fluorophores per frame AND image size
